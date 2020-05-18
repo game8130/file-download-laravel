@@ -24,7 +24,7 @@ class CreateUsersTable extends Migration
             $table->string('name', 20)->comment('暱稱');
             $table->longText('token')->comment('登入Token');
             $table->unsignedTinyInteger('active')->default(1)->comment('狀態(1:啟用,2:停用,3:離職)');
-            $table->dateTime('login_at')->comment('最後登入時間');
+            $table->dateTime('login_at')->nullable()->comment('最後登入時間');
             $table->rememberToken();
             $table->timestamps();
         });
