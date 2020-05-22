@@ -14,6 +14,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::prefix('v1/')->middleware('api')->group(function () {
+    Route::namespace('User')->group(function () {
+        // 登入
+        Route::post('login', 'UsersController@login');
+        // 註冊
+        Route::post('register', 'UsersController@register');
+    });
+    // 登入後
+    Route::middleware('auth.jwt')->group(function () {
+
+    });
 });

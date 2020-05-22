@@ -174,7 +174,14 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
+        // composer require tymon/jwt-auth
+        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+        // composer require mews/captcha
+        Mews\Captcha\CaptchaServiceProvider::class,
+        // composer require torann/geoip
+        Torann\GeoIP\GeoIPServiceProvider::class,
+        // composer require jenssegers/agent
+        Jenssegers\Agent\AgentServiceProvider::class,
     ],
 
     /*
@@ -226,7 +233,9 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
+        'Captcha' => Mews\Captcha\Facades\Captcha::class,
+        'GeoIP' => Torann\GeoIP\Facades\GeoIP::class,
+        'Agent' => Jenssegers\Agent\Facades\Agent::class,
     ],
 
 ];
