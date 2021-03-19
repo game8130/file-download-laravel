@@ -117,6 +117,7 @@ return [
     'uploaded'    => ':attribute 上傳失敗。',
     'url'         => ':attribute 的格式錯誤。',
     'uuid'        => ':attribute 必須是有效的 UUID。',
+    'captcha_api' => ':attribute 不正確。',
 
     /*
     |--------------------------------------------------------------------------
@@ -176,5 +177,6 @@ return [
         'title'                 => '標題',
         'username'              => '使用者名稱',
         'year'                  => '年',
+        'captcha'               => '驗證碼',
     ],
 ];

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c1f1603c690b438841b59301935e7a80",
+    "content-hash": "5b225fa275bae69f34060853b3ce01bb",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1364,27 +1364,27 @@
         },
         {
             "name": "mews/captcha",
-            "version": "3.1.0",
+            "version": "3.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mewebstudio/captcha.git",
-                "reference": "cc4d745c4f7506be0b73ac70324f71408c7e3a80"
+                "reference": "41a3dac8cf45c8d3176fab7810adf1f5fd1d1802"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mewebstudio/captcha/zipball/cc4d745c4f7506be0b73ac70324f71408c7e3a80",
-                "reference": "cc4d745c4f7506be0b73ac70324f71408c7e3a80",
+                "url": "https://api.github.com/repos/mewebstudio/captcha/zipball/41a3dac8cf45c8d3176fab7810adf1f5fd1d1802",
+                "reference": "41a3dac8cf45c8d3176fab7810adf1f5fd1d1802",
                 "shasum": ""
             },
             "require": {
                 "ext-gd": "*",
-                "illuminate/config": "~5.0|^6.0|^7.0",
-                "illuminate/filesystem": "~5.0|^6.0|^7.0",
-                "illuminate/hashing": "~5.0|^6.0|^7.0",
-                "illuminate/session": "~5.0|^6.0|^7.0",
-                "illuminate/support": "~5.0|^6.0|^7.0",
+                "illuminate/config": "~5|^6|^7|^8",
+                "illuminate/filesystem": "~5|^6|^7|^8",
+                "illuminate/hashing": "~5|^6|^7|^8",
+                "illuminate/session": "~5|^6|^7|^8",
+                "illuminate/support": "~5|^6|^7|^8",
                 "intervention/image": "~2.5",
-                "php": "^7.2"
+                "php": "^7.2|^8.0"
             },
             "require-dev": {
                 "mockery/mockery": "^1.0",
@@ -1429,7 +1429,11 @@
                 "laravel6 Captcha",
                 "laravel6 Security"
             ],
-            "time": "2020-03-21T08:52:58+00:00"
+            "support": {
+                "issues": "https://github.com/mewebstudio/captcha/issues",
+                "source": "https://github.com/mewebstudio/captcha/tree/3.2.5"
+            },
+            "time": "2021-01-17T21:30:23+00:00"
         },
         {
             "name": "mobiledetect/mobiledetectlib",
