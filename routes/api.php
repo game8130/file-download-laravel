@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('v1/')->middleware('api')->group(function () {
+Route::prefix('v1/')->namespace('Api')->group(function () {
     Route::namespace('User')->group(function () {
         // 登入
         Route::post('login', 'UsersController@login');

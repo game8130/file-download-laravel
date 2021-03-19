@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\User;
+namespace App\Http\Controllers\Api\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,10 +31,7 @@ class UsersController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->responseWithJson($request, [
-                'code'  => config('apiCode.validateFail'),
-                'error' => $validator->errors()->all(),
-            ]);
+            return $this->apiValidateFail($request, $validator);
         }
         return $this->responseWithJson($request, $this->usersServices->login($request->all(), $request->ip()));
     }
@@ -54,10 +51,7 @@ class UsersController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->responseWithJson($request, [
-                'code'  => config('apiCode.validateFail'),
-                'error' => $validator->errors()->all(),
-            ]);
+            return $this->apiValidateFail($request, $validator);
         }
         return $this->responseWithJson($request, $this->usersServices->register($request->all()));
     }
