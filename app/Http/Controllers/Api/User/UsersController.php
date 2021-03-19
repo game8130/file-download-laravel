@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\User;
+namespace App\Http\Controllers\Api\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,15 +26,13 @@ class UsersController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'account'  => 'required|regex:/^[A-Za-z0-9]+$/|alpha_num|between:4,20',
-            'password' => 'required|alpha_num|between:8,12',
+            'account'  => 'required|regex:/^[A-Za-z0-9]+$/|alpha_num|between:3,20',
+            'password' => 'required|alpha_dash|between:6,20',
+            'captcha'  => 'required|captcha_api:'. $request['key'],
         ]);
 
         if ($validator->fails()) {
-            return $this->responseWithJson($request, [
-                'code'  => config('apiCode.validateFail'),
-                'error' => $validator->errors()->all(),
-            ]);
+            return $this->apiValidateFail($request, $validator);
         }
         return $this->responseWithJson($request, $this->usersServices->login($request->all(), $request->ip()));
     }
@@ -48,16 +46,13 @@ class UsersController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'account'  => 'required|unique:users,account|regex:/^[A-Za-z0-9]+$/|alpha_num|between:4,20',
-            'password' => 'required|alpha_num|between:8,12|confirmed',
+            'account'  => 'required|unique:users,account|regex:/^[A-Za-z0-9]+$/|alpha_num|between:3,20',
+            'password' => 'required|alpha_num|between:6,20|confirmed',
             'email'    => 'required|unique:users,email|email',
         ]);
 
         if ($validator->fails()) {
-            return $this->responseWithJson($request, [
-                'code'  => config('apiCode.validateFail'),
-                'error' => $validator->errors()->all(),
-            ]);
+            return $this->apiValidateFail($request, $validator);
         }
         return $this->responseWithJson($request, $this->usersServices->register($request->all()));
     }

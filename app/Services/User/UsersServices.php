@@ -64,6 +64,8 @@ class UsersServices
         // 取得 token 並更新該人員 token 資訊
         try {
             $user['user'] = $this->JWTAuth->setToken($user['token'])->toUser();
+            // 黑名單之前 token
+//            $this->JWTAuth->setToken($user['user']['token'])->invalidate();
             $this->usersRepository->update($user['user']->id, ['token' => $user['token']]);
             $this->usersLoginServices->storeLogin(['id' => $user['user']->id, 'account' => $request['account']], $ip);
             return [

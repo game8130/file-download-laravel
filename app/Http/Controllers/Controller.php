@@ -14,6 +14,19 @@ class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     /**
+     * @param $request
+     * @param $validator
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function apiValidateFail($request, $validator)
+    {
+        return $this->responseWithJson($request, [
+            'code'  => config('apiCode.validateFail'),
+            'error' => $validator->errors()->all(),
+        ]);
+    }
+
+    /**
      * 統整要回傳前端的資料格式
      *
      * @param \Illuminate\Http\Request   $request
@@ -33,9 +46,8 @@ class Controller extends BaseController
         if ($statusCode != 200) { // 非 200 的一律寫入到 log
             $error = (!is_array($info['error'])) ? [$info['error']] : $info['error']; // 錯誤訊息(紀錄 log 使用)
             $this->addErrorLog($request, $response, $error);
-            if (env('APP_DEBUG') == true) {
-                $response['error'] = $error;
-            }
+            $response['error'] = $error;
+            unset($response['result']);
         }
         return response()->json($response, $statusCode);
     }
