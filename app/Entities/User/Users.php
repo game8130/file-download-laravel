@@ -47,4 +47,20 @@ class Users extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    /**
+     * 格式化上傳時間
+     */
+    public function getUpdatedAtAttribute($value)
+    {
+        return $value ? date("Y-m-d H:i:s", strtotime($value)) : '';
+    }
+
+    /**
+     * 格式化創建時間
+     */
+    public function getCreatedAtAttribute($value)
+    {
+        return $value ? date("Y-m-d H:i:s", strtotime($value)) : '';
+    }
 }

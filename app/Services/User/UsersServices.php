@@ -110,4 +110,52 @@ class UsersServices
             ];
         }
     }
+
+    /**
+     * 取得目前帳號詳細資訊(含功能權限)
+     *
+     * @return array
+     */
+    public function information()
+    {
+        try {
+            $user = $this->JWTAuth->parseToken()->authenticate();
+            $user['permission'] = $this->getPermission($user['group_role_id']);
+            return [
+                'code'   => config('apiCode.success'),
+                'result' => $user,
+            ];
+        } catch (\Exception $e) {
+            return [
+                'code'  => $e->getCode() ?? config('apiCode.notAPICode'),
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * 取得該權限的功能權限資訊
+     *
+     * @param integer  $groupId
+     * @return array
+     */
+    public function getPermission($groupId)
+    {
+        try {
+            $permission = $this->permissionRepository->hasPermissionAll($groupId)->toArray();
+            $menu = [];
+            foreach (config('permission.permission') as $key => $value) {
+                if ($value['permission'] === true) {
+                    foreach ($value['menu'] as $sub) {
+                        if (in_array($sub['func_key'], $permission)) {
+                            $menu[] = $sub['route'];
+                        }
+                    }
+                }
+            }
+            return $menu;
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
 }

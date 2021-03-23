@@ -56,4 +56,16 @@ class UsersController extends Controller
         }
         return $this->responseWithJson($request, $this->usersServices->register($request->all()));
     }
+
+    /**
+     * 登入檢查
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function information(Request $request)
+    {
+        return $this->responseWithJson($request, $this->userServices->information());
+    }
+
 }

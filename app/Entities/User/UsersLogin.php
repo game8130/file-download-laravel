@@ -2,9 +2,9 @@
 
 namespace App\Entities\User;
 
-use App\Entities\BoserpModel;
+use App\Entities\FileDownloadModel;
 
-class UsersLogin extends BoserpModel
+class UsersLogin extends FileDownloadModel
 {
     protected $table = 'users_login';
     protected $fillable = [
