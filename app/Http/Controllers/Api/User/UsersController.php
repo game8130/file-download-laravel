@@ -65,7 +65,17 @@ class UsersController extends Controller
      */
     public function information(Request $request)
     {
-        return $this->responseWithJson($request, $this->userServices->information());
+        return $this->responseWithJson($request, $this->usersServices->information($request->all()));
     }
 
+    /**
+     * 系統登出
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logout(Request $request)
+    {
+        return $this->responseWithJson($request, $this->usersServices->logout($request->ip()));
+    }
 }
