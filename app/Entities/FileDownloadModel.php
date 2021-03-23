@@ -4,7 +4,7 @@ namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 
-abstract class BoserpModel extends Model
+abstract class FileDownloadModel extends Model
 {
     protected $connection = 'mysql';
 
@@ -40,5 +40,21 @@ abstract class BoserpModel extends Model
     public static function getTableName()
     {
         return with(new static)->getTable();
+    }
+
+    /**
+     * 格式化上傳時間
+     */
+    public function getUpdatedAtAttribute($value)
+    {
+        return $value ? date("Y-m-d H:i:s", strtotime($value)) : '';
+    }
+
+    /**
+     * 格式化創建時間
+     */
+    public function getCreatedAtAttribute($value)
+    {
+        return $value ? date("Y-m-d H:i:s", strtotime($value)) : '';
     }
 }

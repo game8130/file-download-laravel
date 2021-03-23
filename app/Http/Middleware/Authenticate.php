@@ -2,20 +2,35 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use Closure;
+use Illuminate\Contracts\Auth\Factory as Auth;
 
-class Authenticate extends Middleware
+use JWTAuth;
+
+class Authenticate
 {
+    protected $auth;
+
+    public function __construct(Auth $auth)
+    {
+        $this->auth = $auth;
+    }
     /**
      * Get the path the user should be redirected to when they are not authenticated.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  string|null  $guard
      * @return string|null
      */
-    protected function redirectTo($request)
+    public function handle($request, Closure $next, $guard = null)
     {
-        if (! $request->expectsJson()) {
-            return route('login');
+        if ($this->auth->guard($guard)->guest()) {
+            return response('Unauthorized.', 401);
+        } elseif (JWTAuth::getToken() != $this->auth->user()->token) {
+            return response('Unauthorized.', 401);
         }
+        $request['jwt'] = $this->auth->user()->toArray();
+        return $next($request);
     }
 }

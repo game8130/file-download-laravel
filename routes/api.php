@@ -24,7 +24,65 @@ Route::prefix('v1/')->namespace('Api')->group(function () {
         Route::post('register', 'UsersController@register');
     });
     // 登入後
-    Route::middleware('auth.jwt')->group(function () {
-
+    Route::middleware(['auth.jwt', 'auth'])->group(function () {
+        Route::namespace('User')->group(function () {
+            // 登入後檢查
+            Route::get('/auth', 'UserController@information');
+            // 系統登出
+            Route::post('/logout', 'UserController@logout');
+            // 個人資訊
+            Route::get('/dashboard/{uuid}', 'UserController@single');
+        });
+        /*
+        |--------------------------------------------------------------------------
+        | 人事管理系統
+        |--------------------------------------------------------------------------
+        */
+        // 人員管理
+        Route::prefix('user')->namespace('User')->middleware('permission:1001')->group(function () {
+            // 列表
+            Route::get('/', 'UserController@index');
+            // 新增
+            Route::post('/', 'UserController@store');
+            // 修改
+            Route::put('/{uuid}', 'UserController@update');
+            // 刪除
+            Route::delete('/{uuid}', 'UserController@destroy');
+            // 取得單一資料
+            Route::get('/{uuid}', 'UserController@single');
+            // 排序
+            Route::post('/sort', 'UserController@sort');
+        });
+        // 權限管理
+        Route::prefix('group')->namespace('Group')->middleware('permission:1002')->group(function () {
+            // 列表
+            Route::get('/', 'GroupController@index');
+            // 新增
+            Route::post('/', 'GroupController@store');
+            // 修改
+            Route::put('/{id}', 'GroupController@update');
+            // 刪除
+            Route::delete('/{id}', 'GroupController@destroy');
+            // 取得單一資料
+            Route::get('/{id}', 'GroupController@single');
+        });
+        /*
+        |--------------------------------------------------------------------------
+        | 檔案管理
+        |--------------------------------------------------------------------------
+        */
+        // 檔案
+        Route::prefix('file')->namespace('File')->middleware('permission:2202')->group(function () {
+            // 列表
+            Route::get('/', 'FileController@index');
+            // 新增
+            Route::post('/', 'FileController@store');
+            // 修改因為有檔案所以沒辦法使用put
+            Route::post('/update/{file}', 'FileController@update');
+            // 刪除
+            Route::delete('/{file}', 'FileController@destroy');
+            // 取得單一資料
+            Route::get('/{file}', 'FileController@show');
+        });
     });
 });

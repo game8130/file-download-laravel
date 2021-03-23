@@ -242,4 +242,26 @@ trait Repository
         $response = $entity->get();
         return ($toArray) ? $response->toArray() : $response;
     }
+
+    /**
+     * 用於排序與每個頁面數量要幾個
+     * @param $query
+     * @param $parameters
+     * @return mixed
+     */
+    public function sortByAndItemsPerPage($query, $parameters) {
+        if (isset($parameters['sortBy'])) {
+            if(isset($parameters['sortDesc']) && $parameters['sortDesc'] == 'true') {
+                $query->orderBy($parameters['sortBy'], 'DESC');
+            } else {
+                $query->orderBy($parameters['sortBy'], 'ASC');
+            }
+        }
+        if (empty($parameters['itemsPerPage']) || $parameters['itemsPerPage'] < 0) {
+            $parameters['itemsPerPage'] = config('common.admin.paginate');
+        } else if ($parameters['itemsPerPage'] > 500) {
+            $parameters['itemsPerPage'] = 500;
+        }
+        return $query->paginate($parameters['itemsPerPage']);
+    }
 }
