@@ -25,11 +25,11 @@ class UsersLoginServices
      *
      * @param array    $user    [需有id、account兩個欄位資料]
      * @param string   $ip      [目前IP]
-     * @param integer  $active  [登入狀態]
+     * @param integer  $status  [登入狀態]
      *
      * @return mixed|string
      */
-    public function storeLogin($user, $ip = '', $active = 1)
+    public function storeLogin($user, $ip = '', $status = 1)
     {
         try {
             $ip = get_real_ip($ip);
@@ -51,7 +51,7 @@ class UsersLoginServices
                 'device'       => $agent->isMobile() ? 2 : 1,
                 'device_info'  => $deviceInfo,
                 'area'         => $this->ipToAreaServices->ipToArea($ip),
-                'active'       => $active,
+                'status'       => $status,
             ]);
         } catch (\Exception $e) {
             // 記錄錯誤

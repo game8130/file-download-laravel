@@ -4,6 +4,7 @@ namespace App\Services\User;
 
 use App\Repositories\User\UsersRepository;
 use App\Repositories\Group\GroupsRepository;
+use App\Repositories\Permission\PermissionRepository;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\JWTAuth;
@@ -16,18 +17,21 @@ class UsersServices
     private $usersRepository;
     private $groupsRepository;
     private $usersLoginServices;
+    private $permissionRepository;
 
     public function __construct(
         JWTAuth $JWTAuth,
         UsersRepository $usersRepository,
         GroupsRepository $groupsRepository,
-        UsersLoginServices $usersLoginServices
+        UsersLoginServices $usersLoginServices,
+        PermissionRepository $permissionRepository
 
     ) {
         $this->JWTAuth = $JWTAuth;
         $this->usersRepository = $usersRepository;
         $this->groupsRepository = $groupsRepository;
         $this->usersLoginServices = $usersLoginServices;
+        $this->permissionRepository = $permissionRepository;
     }
 
 
@@ -116,11 +120,11 @@ class UsersServices
      *
      * @return array
      */
-    public function information()
+    public function information(array $request)
     {
         try {
-            $user = $this->JWTAuth->parseToken()->authenticate();
-            $user['permission'] = $this->getPermission($user['group_role_id']);
+            $user = $request['jwt'];
+            $user['permission'] = $this->getPermission($request['jwt']['group_id']);
             return [
                 'code'   => config('apiCode.success'),
                 'result' => $user,
@@ -156,6 +160,66 @@ class UsersServices
             return $menu;
         } catch (\Exception $e) {
             return [];
+        }
+    }
+
+    /**
+     * 系統登出
+     *
+     * @param  string  $ip
+     * @return array
+     */
+    public function logout($ip)
+    {
+        try {
+            $user = $this->JWTAuth->parseToken()->authenticate();
+            $this->updateUserToken($user['id'], $user['token'], '');
+            $this->usersLoginServices->storeLogin($user, $ip, 2);
+            return [
+                'code'   => config('apiCode.success'),
+                'result' => true,
+            ];
+        } catch (\Exception $e) {
+            return [
+                'code'  => $e->getCode() ?? config('apiCode.notAPICode'),
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * 系統自動將帳號自動登出
+     *
+     * @param array $user
+     */
+    public function kickerUser($user)
+    {
+        $this->updateUserToken($user['id'], $user['token'], '');
+        $this->usersLoginServices->storeLogin($user, '', 3);
+    }
+
+    /**
+     * 更新帳號Token資訊
+     *
+     * @param integer $userID
+     * @param string  $oldToken
+     * @param string  $newToken
+     */
+    public function updateUserToken($userID, $oldToken, $newToken)
+    {
+        try {
+            $this->JWTAuth->setToken($oldToken)->invalidate();
+            $this->usersRepository->update($userID, [
+                'token' => $newToken
+            ]);
+        } catch (TokenExpiredException $e) {
+            $this->usersRepository->update($userID, [
+                'token' => $newToken
+            ]);
+        } catch (JWTException $e) {
+            $this->usersRepository->update($userID, [
+                'token' => $newToken
+            ]);
         }
     }
 }

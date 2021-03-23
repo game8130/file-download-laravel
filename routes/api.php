@@ -27,11 +27,9 @@ Route::prefix('v1/')->namespace('Api')->group(function () {
     Route::middleware(['auth.jwt', 'auth'])->group(function () {
         Route::namespace('User')->group(function () {
             // 登入後檢查
-            Route::get('/auth', 'UserController@information');
+            Route::get('/auth', 'UsersController@information');
             // 系統登出
-            Route::post('/logout', 'UserController@logout');
-            // 個人資訊
-            Route::get('/dashboard/{uuid}', 'UserController@single');
+            Route::post('/logout', 'UsersController@logout');
         });
         /*
         |--------------------------------------------------------------------------
@@ -41,17 +39,17 @@ Route::prefix('v1/')->namespace('Api')->group(function () {
         // 人員管理
         Route::prefix('user')->namespace('User')->middleware('permission:1001')->group(function () {
             // 列表
-            Route::get('/', 'UserController@index');
+            Route::get('/', 'UsersController@index');
             // 新增
-            Route::post('/', 'UserController@store');
+            Route::post('/', 'UsersController@store');
             // 修改
-            Route::put('/{uuid}', 'UserController@update');
+            Route::put('/{uuid}', 'UsersController@update');
             // 刪除
-            Route::delete('/{uuid}', 'UserController@destroy');
+            Route::delete('/{uuid}', 'UsersController@destroy');
             // 取得單一資料
-            Route::get('/{uuid}', 'UserController@single');
+            Route::get('/{uuid}', 'UsersController@single');
             // 排序
-            Route::post('/sort', 'UserController@sort');
+            Route::post('/sort', 'UsersController@sort');
         });
         // 權限管理
         Route::prefix('group')->namespace('Group')->middleware('permission:1002')->group(function () {
@@ -72,7 +70,7 @@ Route::prefix('v1/')->namespace('Api')->group(function () {
         |--------------------------------------------------------------------------
         */
         // 檔案
-        Route::prefix('file')->namespace('File')->middleware('permission:2202')->group(function () {
+        Route::prefix('file')->namespace('File')->middleware('permission:1101')->group(function () {
             // 列表
             Route::get('/', 'FileController@index');
             // 新增
