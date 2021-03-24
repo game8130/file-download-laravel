@@ -61,6 +61,8 @@ Route::prefix('v1/')->namespace('Api')->group(function () {
             Route::delete('/{id}', 'GroupController@destroy');
             // 取得單一資料
             Route::get('/{id}', 'GroupController@single');
+            // 權限資訊
+            Route::get('/permission', 'GroupController@getPermission');
         });
         /*
         |--------------------------------------------------------------------------
