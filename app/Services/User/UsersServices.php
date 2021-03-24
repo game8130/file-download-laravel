@@ -222,4 +222,148 @@ class UsersServices
             ]);
         }
     }
+
+    /**
+     * 人員管理-列表
+     *
+     * @param  array  $request
+     * @return array
+     */
+    public function index(array $request = [])
+    {
+        try {
+            return [
+                'code'   => config('apiCode.success'),
+                'result' => $this->usersRepository->list($request),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'code'  => $e->getCode() ?? config('apiCode.notAPICode'),
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * 人員管理-新增
+     *
+     * @param array $request
+     * @return array
+     */
+    public function store(array $request)
+    {
+        try {
+            $user = $this->usersRepository->store([
+                'group_id'      => $request['group_id'],
+                'account'       => $request['account'],
+                'email'         => $request['email'],
+                'password'      => Hash::make(config('default.adminPassword')),
+                'name'          => $request['name'],
+                'active'        => 1,
+                'token'         => '',
+            ]);
+            return [
+                'code'   => config('apiCode.success'),
+                'result' => $user,
+            ];
+        } catch (\Exception $e) {
+            return [
+                'code'  => $e->getCode() ?? config('apiCode.notAPICode'),
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * 人員管理-修改
+     *
+     * @param array $request
+     * @return array
+     */
+    public function update(array $request)
+    {
+        try {
+            $clearToken = false;
+            $user = $this->usersRepository->find($request['id']);
+            // 最高管理員無法修改
+            if (in_array($user['account'], [config('default.adminAccount')])) {
+                return [
+                    'code' => config('apiCode.unchangeable'),
+                    'error' => 'The data unchangeable',
+                ];
+            }
+            if (isset($request['password']) && $request['password'] != "") {
+                $request['password'] = Hash::make($request['password']);
+                $clearToken = true;
+            } else {
+                unset($request['password']);
+                unset($request['password_confirmation']);
+            }
+            $this->usersRepository->update($user['id'], $request);
+            // 刪除token
+            if ($clearToken) {
+                $this->kickerUser($user);
+            }
+            return [
+                'code'   => config('apiCode.success'),
+                'result' => true,
+            ];
+        } catch (\Exception $e) {
+            return [
+                'code'  => $e->getCode() ?? config('apiCode.notAPICode'),
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * 人員管理-刪除
+     *
+     * @param array $request
+     * @return array
+     */
+    public function destroy(array $request)
+    {
+        try {
+            $user = $this->usersRepository->find($request['id']);
+            // 最高管理員無法刪除
+            if (in_array($user['account'], [config('default.adminAccount')])) {
+                return [
+                    'code' => config('apiCode.unchangeable'),
+                    'error' => 'The data unchangeable',
+                ];
+            }
+            return [
+                'code'   => config('apiCode.success'),
+                'result' => $this->usersRepository->destroy($user['id']),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'code'  => $e->getCode() ?? config('apiCode.notAPICode'),
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * 人員管理-取得單一資料
+     *
+     * @param  array  $request
+     * @return array
+     */
+    public function single(array $request = [])
+    {
+        try {
+            $user = $this->usersRepository->findWithGroup($request['id']);
+            return [
+                'code'   => config('apiCode.success'),
+                'result' => $user,
+            ];
+        } catch (\Exception $e) {
+            return [
+                'code'  => $e->getCode() ?? config('apiCode.notAPICode'),
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
 }

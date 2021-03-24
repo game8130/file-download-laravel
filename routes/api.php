@@ -43,13 +43,11 @@ Route::prefix('v1/')->namespace('Api')->group(function () {
             // 新增
             Route::post('/', 'UsersController@store');
             // 修改
-            Route::put('/{uuid}', 'UsersController@update');
+            Route::put('/{id}', 'UsersController@update');
             // 刪除
-            Route::delete('/{uuid}', 'UsersController@destroy');
+            Route::delete('/{id}', 'UsersController@destroy');
             // 取得單一資料
-            Route::get('/{uuid}', 'UsersController@single');
-            // 排序
-            Route::post('/sort', 'UsersController@sort');
+            Route::get('/{id}', 'UsersController@single');
         });
         // 權限管理
         Route::prefix('group')->namespace('Group')->middleware('permission:1002')->group(function () {
