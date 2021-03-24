@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Entities\Group\Groups;
 
 class Users extends Authenticatable implements JWTSubject
 {
@@ -62,5 +63,13 @@ class Users extends Authenticatable implements JWTSubject
     public function getCreatedAtAttribute($value)
     {
         return $value ? date("Y-m-d H:i:s", strtotime($value)) : '';
+    }
+
+    /**
+     * 權限
+     */
+    public function group()
+    {
+        return $this->belongsTo(Groups::class, 'group_id', 'id')->select(['id', 'name']);
     }
 }
