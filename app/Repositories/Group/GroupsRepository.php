@@ -13,4 +13,14 @@ class GroupsRepository
     {
         $this->setEntity(Groups::class);
     }
+
+    /**
+     * @param array $parameters
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function getByWithUser(array $parameters)
+    {
+        $group = Groups::with('users');
+        return $this->sortByAndItemsPerPage($group, $parameters);
+    }
 }

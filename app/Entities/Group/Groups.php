@@ -10,8 +10,11 @@ class Groups extends FileDownloadModel
     protected $table = 'groups';
     protected $fillable = ['name'];
 
+    /**
+     * 使用者
+     */
     public function users()
     {
-        return $this->hasOne(Users::class, 'group_id', 'id');
+        return $this->hasMany(Users::class, 'group_id', 'id');
     }
 }
