@@ -18,6 +18,25 @@ class GroupController extends Controller {
     }
 
     /**
+     * 自訂驗證
+     */
+    private function validatorExtend() {
+        // 權限檢查
+        Validator::extend('permissions', function ($attribute, $permissions, $parameters, $validator) {
+            $funcKeys = $this->groupServices->getPermissionFuncKey()['result'];
+            foreach ($permissions as $permission) {
+                if (empty($permission)) {
+                    return true;
+                }
+                if (!in_array($permission, $funcKeys)) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+
+    /**
      * 權限管理-列表
      *
      * @param Request $request
@@ -36,9 +55,11 @@ class GroupController extends Controller {
      */
     public function store(Request $request)
     {
+        $this->validatorExtend();
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:groups,name|max:20',
-        ]);
+            'permissions' => 'required|array|permissions',
+        ], ['permissions' => '權限值傳入錯誤']);
 
         if ($validator->fails()) {
             return $this->apiValidateFail($request, $validator);
@@ -56,10 +77,12 @@ class GroupController extends Controller {
     public function update(Request $request, $id)
     {
         $request['id'] = $id;
+        $this->validatorExtend();
         $validator = Validator::make($request->all(), [
             'id'   => 'required|exists:groups,id',
             'name' => 'required|max:20|unique:groups,name,'.$id,
-        ]);
+            'permissions' => 'required|array|permissions',
+        ], ['permissions' => '權限值傳入錯誤']);
 
         if ($validator->fails()) {
             return $this->apiValidateFail($request, $validator);
@@ -105,5 +128,16 @@ class GroupController extends Controller {
             return $this->apiValidateFail($request, $validator);
         }
         return $this->responseWithJson($request, $this->groupServices->single($request->all()));
+    }
+
+    /**
+     * 取得功能權限設定資料
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getPermission(Request $request)
+    {
+        return $this->responseWithJson($request, $this->groupServices->getPermission());
     }
 }

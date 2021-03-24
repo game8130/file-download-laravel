@@ -59,10 +59,10 @@ Route::prefix('v1/')->namespace('Api')->group(function () {
             Route::put('/{id}', 'GroupController@update');
             // 刪除
             Route::delete('/{id}', 'GroupController@destroy');
-            // 取得單一資料
-            Route::get('/{id}', 'GroupController@single');
             // 權限資訊
             Route::get('/permission', 'GroupController@getPermission');
+            // 取得單一資料
+            Route::get('/{id}', 'GroupController@single');
         });
         /*
         |--------------------------------------------------------------------------
