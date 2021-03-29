@@ -82,5 +82,16 @@ Route::prefix('v1/')->namespace('Api')->group(function () {
             // 取得單一資料
             Route::get('/{file}', 'FileController@show');
         });
+
+        /*
+        |--------------------------------------------------------------------------
+        | 系統相關(已登入)
+        |--------------------------------------------------------------------------
+        */
+        // 下拉式選單
+        Route::prefix('dropdown')->namespace('Dropdown')->group(function () {
+            // 通用設定檔
+            Route::get('/{method}', 'DropdownController@index');
+        });
     });
 });
