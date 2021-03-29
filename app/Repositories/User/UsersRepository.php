@@ -15,6 +15,16 @@ class UsersRepository
     }
 
     /**
+     * 取得下拉式選單資料
+     *
+     * @return array
+     */
+    public function dropdown()
+    {
+        return Users::select('id', 'name')->orderBy('id', 'ASC')->get()->toArray();
+    }
+
+    /**
      * @param array $parameters
      * @return mixed
      */
@@ -30,6 +40,6 @@ class UsersRepository
      */
     public function findWithGroup($id)
     {
-        return Users::find($id)->with('group')->first();
+        return Users::where('id', $id)->with('group')->first();
     }
 }
