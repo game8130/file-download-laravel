@@ -115,9 +115,12 @@ class FileServices
     public function show(array $request)
     {
         try {
+            $files = $this->filesRepository->findWithFileUrl($request['id']);
+            $name = $files->name . '.' . pathinfo($files->fileUrl->url, PATHINFO_EXTENSION);
+            $files['new_name'] = $name;
             return [
                 'code'   => config('apiCode.success'),
-                'result' => $this->filesRepository->find($request['id']),
+                'result' => $files,
             ];
         } catch (\Exception $e) {
             return [
@@ -126,5 +129,29 @@ class FileServices
             ];
         }
     }
-    
+
+    /**
+     * @param array $request
+     * @return array
+     */
+    public function downloadFile(array $request)
+    {
+        try {
+            $file = $this->filesRepository->findWithFileUrl($request['id']);
+            $this->fileUrlRepository->update($file->file_url_id, ['count' => $file->fileUrl->count+1]);
+            
+            return [
+                'code'   => config('apiCode.success'),
+                'result' => [
+                    'name' => $file->name,
+                    'url'  => $file->fileUrl->url,
+                ],
+            ];
+        } catch (\Exception $e) {
+            return [
+                'code'  => $e->getCode() ?? config('apiCode.notAPICode'),
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
 }

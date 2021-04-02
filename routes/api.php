@@ -25,6 +25,23 @@ Route::prefix('v1/')->namespace('Api')->group(function () {
     });
     // 登入後
     Route::middleware(['auth.jwt', 'auth'])->group(function () {
+        /*
+        |--------------------------------------------------------------------------
+        | 會員端資料
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('/web')->group(function () {
+            Route::prefix('/group')->namespace('Group')->group(function () {
+                // 檔案權限
+                Route::get('/', 'GroupController@webIndex');
+            });
+            Route::prefix('/file')->namespace('File')->group(function () {
+                // 取得檔案名稱
+                Route::get('/{file}', 'FileController@show');
+                // 檔案權限
+                Route::post('/download', 'FileController@downloadFile')->middleware('permission.file');
+            });
+        });
         Route::namespace('User')->group(function () {
             // 登入後檢查
             Route::get('/auth', 'UsersController@information');

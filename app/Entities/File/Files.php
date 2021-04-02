@@ -11,6 +11,6 @@ class Files extends FileDownloadModel
 
     public function fileUrl()
     {
-        return $this->hasOne(FileUrl::class, 'files_id', 'id');
+        return $this->hasOne(FileUrl::class, 'id', 'file_url_id');
     }
 }

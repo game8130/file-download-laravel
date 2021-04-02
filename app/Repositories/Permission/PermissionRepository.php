@@ -36,15 +36,4 @@ class PermissionRepository
     {
         return Permission::where('group_id', $groupId)->pluck('func_key');
     }
-
-    /**
-     * 刪除該權限ID 底下的功能權限資料
-     *
-     * @param  integer $groupId
-     * @return mixed
-     */
-    public function destroyByGroupId($groupId)
-    {
-        return Permission::where('group_id', $groupId)->delete();
-    }
 }
