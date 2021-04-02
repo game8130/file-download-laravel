@@ -4,23 +4,31 @@ namespace App\Services\Group;
 
 use App\Repositories\Group\GroupsRepository;
 use App\Repositories\User\UsersRepository;
+use App\Repositories\File\FilesRepository;
 use App\Repositories\Permission\PermissionRepository;
+use App\Repositories\Permission\PermissionFileRepository;
 use Carbon\Carbon;
 
 class GroupServices
 {
     private $groupsRepository;
     private $usersRepository;
+    private $filesRepository;
     private $permissionRepository;
+    private $permissionFileRepository;
 
     public function __construct(
         GroupsRepository $groupsRepository,
         UsersRepository $usersRepository,
-        PermissionRepository $permissionRepository
+        FilesRepository $filesRepository,
+        PermissionRepository $permissionRepository,
+        PermissionFileRepository $permissionFileRepository
     ) {
         $this->groupsRepository = $groupsRepository;
         $this->usersRepository = $usersRepository;
+        $this->filesRepository = $filesRepository;
         $this->permissionRepository = $permissionRepository;
+        $this->permissionFileRepository = $permissionFileRepository;
     }
 
     /**
@@ -58,7 +66,8 @@ class GroupServices
     {
         try {
             $group = $this->groupsRepository->store(['name' => $request['name']]);
-            return $this->storePermission($request, $group['id']);
+            $this->storePermission($request['permissions'], $group['id']);
+            return $this->storePermissionFile($request['files'], $group['id']);
         } catch (\Exception $e) {
             return [
                 'code'  => $e->getCode() ?? config('apiCode.notAPICode'),
@@ -76,9 +85,15 @@ class GroupServices
     public function update(array $request)
     {
         try {
-            $this->permissionRepository->destroyByGroupId($request['id']);
+            $this->permissionRepository->deleteByWhere('group_id', $request['id']);
+            $this->storePermission($request['permissions'], $request['id']);
+            $this->permissionFileRepository->deleteByWhere('group_id', $request['id']);
+            $this->storePermissionFile($request['files'], $request['id']);
             $this->groupsRepository->update($request['id'], ['name' => $request['name']]);
-            return $this->storePermission($request, $request['id']);
+            return [
+                'code'   => config('apiCode.success'),
+                'result' => true,
+            ];
         } catch (\Exception $e) {
             return [
                 'code'  => $e->getCode() ?? config('apiCode.notAPICode'),
@@ -103,6 +118,8 @@ class GroupServices
                     'error'  => '此群組還有人員無法刪除',
                 ];
             }
+            $this->permissionRepository->deleteByWhere('group_id', $request['id']);
+            $this->permissionFileRepository->deleteByWhere('group_id', $request['id']);
             return [
                 'code'   => config('apiCode.success'),
                 'result' => $this->groupsRepository->destroy($request['id']),
@@ -116,7 +133,7 @@ class GroupServices
     }
 
     /**
-     * 權限管理-刪除
+     * 權限管理-取得單一資料
      *
      * @param array $request
      * @return array
@@ -126,7 +143,11 @@ class GroupServices
         try {
             return [
                 'code'   => config('apiCode.success'),
-                'result' => $this->groupsRepository->find($request['id']),
+                'result' => [
+                    'group' => $this->groupsRepository->find($request['id']),
+                    'permission' => $this->permissionRepository->hasPermissionAll($request['id']),
+                    'file' => $this->permissionFileRepository->hasFileAll($request['id']),
+                ],
             ];
         } catch (\Exception $e) {
             return [
@@ -137,16 +158,16 @@ class GroupServices
     }
 
     /**
-     * @param array $request
+     * @param array $permissions
      * @param int   $groupId
      * @return array
      */
-    public function storePermission($request, $groupId) {
+    public function storePermission($permissions, $groupId) {
         try {
             $permission = [];
             $insert = false;
-            foreach ($request['permissions'] as $value) {
-                if (!empty($value)) {
+            if(!empty($permissions)) {
+                foreach ($permissions as $value) {
                     $permission[] = [
                         'group_id'   => $groupId,
                         'func_key'   => $value,
@@ -155,8 +176,8 @@ class GroupServices
                     ];
                     $insert = true;
                 }
-
             }
+            
             if ($insert) {
                 $this->permissionRepository->insertMuti($permission);
             }
@@ -207,9 +228,11 @@ class GroupServices
                     ];
                 }
             }
+            $result['permissions'] = $permission;
+            $result['files'] = $this->filesRepository->dropdown();
             return [
                 'code'   => config('apiCode.success'),
-                'result' => $permission,
+                'result' => $result,
             ];
         } catch (\Exception $e) {
             return [
@@ -244,6 +267,67 @@ class GroupServices
             return [
                 'code'   => config('apiCode.success'),
                 'result' => $funcKey,
+            ];
+        } catch (\Exception $e) {
+            return [
+                'code'  => $e->getCode() ?? config('apiCode.notAPICode'),
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * 新增檔案權限
+     * 
+     * @param array $files
+     * @param int   $groupId
+     * @return array
+     */
+    public function storePermissionFile($files, $groupId)
+    {
+        try {
+            $permission = [];
+            $insert = false;
+            if (!empty($files)) {
+                foreach($files as $value) {
+                    $permission[] = [
+                        'group_id'   => $groupId,
+                        'file_id'    => $value,
+                        'created_at' => Carbon::now()->toDateTimeString(),
+                        'updated_at' => Carbon::now()->toDateTimeString(),
+                    ];
+                    $insert = true;
+                }
+            }
+            if ($insert) {
+                $this->permissionFileRepository->insertMuti($permission);
+            }
+            return [
+                'code'   => config('apiCode.success'),
+                'result' => true,
+            ];
+        } catch (\Exception $e) {
+            return [
+                'code'  => $e->getCode() ?? config('apiCode.notAPICode'),
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+    
+    /**
+     * 會員端
+     * @param array $request
+     * @return array
+     */
+    public function webIndex(array $request = [])
+    {
+        try {
+            $permissionFile = $this->permissionFileRepository->getByWith($request);
+            $collection = collect($permissionFile);
+            $sorted = $collection->sort();
+            return [
+                'code'   => config('apiCode.success'),
+                'result' => $sorted->values()->all(),
             ];
         } catch (\Exception $e) {
             return [

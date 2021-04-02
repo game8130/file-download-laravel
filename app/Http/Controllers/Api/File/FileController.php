@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Services\File\FileServices;
+use Storage;
 
 class FileController extends Controller
 {
@@ -95,5 +96,22 @@ class FileController extends Controller
     public function destroy(File $file)
     {
         //
+    }
+
+    /**
+     * 下載檔案
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function downloadFile(Request $request)
+    {
+        $file = $this->fileServices->downloadFile($request->all());
+        $path = Storage::path('/public/' . $file['result']['url']);
+        $name = $file['result']['name'] . '.' . pathinfo($file['result']['url'], PATHINFO_EXTENSION);
+        $headers = [
+            'Content-Type' => 'application/' . pathinfo($file['result']['url'], PATHINFO_EXTENSION),
+        ];
+        return response()->download($path, $name, $headers);
     }
 }

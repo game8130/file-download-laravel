@@ -4,6 +4,7 @@ namespace App\Repositories\User;
 
 use App\Entities\User\Users;
 use App\Repositories\Repository;
+use DB;
 
 class UsersRepository
 {

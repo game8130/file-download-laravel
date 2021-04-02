@@ -14,9 +14,24 @@ class FilesRepository
         $this->setEntity(Files::class);
     }
 
+    /**
+     * 取得下拉式選單資料
+     *
+     * @return array
+     */
+    public function dropdown()
+    {
+        return Files::select('id', 'name')->orderBy('id', 'ASC')->get()->toArray();
+    }
+
     public function list(array $parameters)
     {
         $file = Files::select(['*'])->with('fileUrl');
         return $this->sortByAndItemsPerPage($file, $parameters);
+    }
+
+    public function findWithFileUrl($id)
+    {
+        return Files::with('fileUrl')->find($id);
     }
 }

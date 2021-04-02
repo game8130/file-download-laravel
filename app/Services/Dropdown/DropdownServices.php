@@ -4,19 +4,24 @@ namespace App\Services\Dropdown;
 
 use App\Repositories\Group\GroupsRepository;
 use App\Repositories\User\UsersRepository;
+use App\Repositories\File\FilesRepository;
+
 use JWTAuth;
 
 class DropdownServices
 {
     private $groupsRepository;
     private $usersRepository;
+    private $filesRepository;
 
     public function __construct(
         GroupsRepository $groupsRepository,
-        UsersRepository $usersRepository
+        UsersRepository $usersRepository,
+        FilesRepository $filesRepository
     ) {
         $this->groupsRepository = $groupsRepository;
         $this->usersRepository = $usersRepository;
+        $this->filesRepository = $filesRepository;
     }
 
     /**
@@ -51,6 +56,9 @@ class DropdownServices
                             'name' => $value
                         ];
                     }
+                    break;
+                case 'file': // 檔案
+                    $dropdown = $this->filesRepository->dropdown($param);
                     break;
             }
             return [

@@ -57,8 +57,10 @@ class GroupController extends Controller {
     {
         $this->validatorExtend();
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:groups,name|max:20',
+            'name'        => 'required|unique:groups,name|max:20',
             'permissions' => 'required|array|permissions',
+            'files'       => 'required|array',
+            'files.*'     => 'required|distinct|exists:files,id',
         ], ['permissions' => '權限值傳入錯誤']);
 
         if ($validator->fails()) {
@@ -79,9 +81,11 @@ class GroupController extends Controller {
         $request['id'] = $id;
         $this->validatorExtend();
         $validator = Validator::make($request->all(), [
-            'id'   => 'required|exists:groups,id',
-            'name' => 'required|max:20|unique:groups,name,'.$id,
+            'id'          => 'required|exists:groups,id',
+            'name'        => 'required|max:20|unique:groups,name,'.$id,
             'permissions' => 'required|array|permissions',
+            'files'       => 'required|array',
+            'files.*'     => 'required|distinct|exists:files,id',
         ], ['permissions' => '權限值傳入錯誤']);
 
         if ($validator->fails()) {
@@ -139,5 +143,16 @@ class GroupController extends Controller {
     public function getPermission(Request $request)
     {
         return $this->responseWithJson($request, $this->groupServices->getPermission());
+    }
+
+    /**
+     * 會員端
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function webIndex(Request $request)
+    {
+        return $this->responseWithJson($request, $this->groupServices->webIndex($request->all()));
     }
 }
